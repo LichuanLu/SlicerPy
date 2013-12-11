@@ -275,7 +275,16 @@ class HelloChartWidget:
             highlighter: {
                 show:true,
                 useAxesFormatters:false,
-                formatString:'%.3g,%.3g'
+                tooltipContentEditor:function (str,seriesIndex,pointIndex,plot) {
+                    var label = plot.axes.xaxis._ticks[pointIndex*2+1].label;
+                    if(seriesIndex == 1){
+                        return "Group data-"+label+":"+plot.data[seriesIndex][pointIndex]
+                    }
+                    else{
+                        return "Patient data-"+label+":"+plot.data[seriesIndex][pointIndex]
+
+                    }                    
+                }
 
             },
             cursor: {
@@ -348,7 +357,12 @@ class HelloChartWidget:
             highlighter: {
                 show:true,
                 useAxesFormatters:false,
-                formatString:'%.3g,%.3g'
+                tooltipContentEditor:function (str,seriesIndex,pointIndex,plot) {
+                    var label = plot.axes.xaxis._ticks[pointIndex*2+1].label;
+                    
+                        return "Zscore data-"+label+":"+plot.data[seriesIndex][pointIndex]
+                                     
+                }
             },
             cursor: {
                 show: true,

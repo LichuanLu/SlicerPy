@@ -271,7 +271,9 @@ class HelloChartWidget:
             print "chart string:" + result
             result = result + "var xAxisTicks = " + str(groupChartDao.getAreaList()) + ";"
             print "chart string:" + result
-            optionStr = ''' var options = { highlighter: {
+            optionStr = ''' var options = { 
+            highlighter: {
+                show:true,
                 useAxesFormatters:false,
                 formatString:'%.3g,%.3g'
 
@@ -342,10 +344,11 @@ class HelloChartWidget:
             print "chart string:" + result
             result = result + "var xAxisTicks = " + str(zscoreChartDao.getAreaList()) + ";"
             print "chart string:" + result
-            optionStr = ''' var options = { highlighter: {
-                show: true, 
-                showLabel: true, 
-                tooltipAxes: 'y'
+            optionStr = ''' var options = { 
+            highlighter: {
+                show:true,
+                useAxesFormatters:false,
+                formatString:'%.3g,%.3g'
             },
             cursor: {
                 show: true,

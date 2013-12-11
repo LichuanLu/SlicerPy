@@ -136,7 +136,7 @@ class HelloingWidget:
     def onTreeItemDoubleClicked(self, item, index):
         print str(index) + ',' + item.text(0) + ',' + item.text(1)
         # slicer.util.loadScene("/Users/lichuan/Desktop/subjects/bert/slicerBertScene.mrml")
-        base_path = '/Users/lichuan/Desktop/subjects'
+        base_path = "C:\\subjects"
         #add patient name and result in path
         current_path = base_path + '/bert'
         self.loadResultScene(current_path,True)

@@ -67,13 +67,13 @@ class HelloChartWidget:
     # Change the layout to one that has a chart.  This created the ChartView
 
         ln = slicer.util.getNode(pattern='vtkMRMLLayoutNode*')
-        ln.SetViewArrangement(24)
+        ln.SetViewArrangement(80)
 
     # Get the first ChartView node
 
-        cvn = slicer.util.getNode(pattern='vtkMRMLChartViewNode*')
-        slicer.util.loadVolume('/Users/lichuan/Desktop/subjects/FA.nrrd')
-        volumeNode = slicer.util.getNode(pattern='FA')
+        cvns = slicer.util.getNodes(pattern='vtkMRMLChartViewNode*')
+        #slicer.util.loadVolume('/Users/lichuan/Desktop/subjects/FA.nrrd')
+        #volumeNode = slicer.util.getNode(pattern='FA')
 
         # # Create another data array
         # dn3 = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
@@ -156,46 +156,60 @@ class HelloChartWidget:
         # cvn.SetChartNodeID(cn.GetID())
         #-----------------
          # Create arrays of data
-        dn = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
-        a = dn.GetArray()
-        a.SetNumberOfTuples(600)
-        x = range(0, 600)
-        for i in range(len(x)):
-          a.SetComponent(i, 0, x[i]/50.0)
-          a.SetComponent(i, 1, math.sin(x[i]/50.0))
-          a.SetComponent(i, 2, 0)
+        # dn = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
+        # a = dn.GetArray()
+        # a.SetNumberOfTuples(600)
+        # x = range(0, 600)
+        # for i in range(len(x)):
+        #   a.SetComponent(i, 0, x[i]/50.0)
+        #   a.SetComponent(i, 1, math.sin(x[i]/50.0))
+        #   a.SetComponent(i, 2, 0)
 
-        dn2 = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
-        a = dn2.GetArray()
-        a.SetNumberOfTuples(600)
-        x = range(0, 600)
-        for i in range(len(x)):
-          a.SetComponent(i, 0, x[i]/50.0)
-          a.SetComponent(i, 1, math.cos(x[i]/50.0))
-          a.SetComponent(i, 2, 0)
+        # dn2 = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
+        # a = dn2.GetArray()
+        # a.SetNumberOfTuples(600)
+        # x = range(0, 600)
+        # for i in range(len(x)):
+        #   a.SetComponent(i, 0, x[i]/50.0)
+        #   a.SetComponent(i, 1, math.cos(x[i]/50.0))
+        #   a.SetComponent(i, 2, 0)
 
-        # Create the ChartNode, 
-        cn = slicer.mrmlScene.AddNode(slicer.vtkMRMLChartNode())
+        # # Create the ChartNode, 
+        # cn = slicer.mrmlScene.AddNode(slicer.vtkMRMLChartNode())
 
-        # Add data to the Chart
-        cn.AddArray('A double array', dn.GetID())
-        cn.AddArray('Another double array', dn2.GetID())
+        # # Add data to the Chart
+        # cn.AddArray('A double array', dn.GetID())
+        # cn.AddArray('Another double array', dn2.GetID())
 
-        # Configure properties of the Chart
-        cn.SetProperty('default', 'title', 'A simple chart with 2 curves')
-        cn.SetProperty('default', 'xAxisLabel', 'Something in x')
-        cn.SetProperty('default', 'yAxisLabel', 'Something in y')
-        cn.SetProperty('default', 'type', 'Bar')
-        cn.SetProperty('Another double array', 'type', 'Line')
-        cn.SetProperty('A double array', 'color', '#fe7d20')
-        # Set the chart to display
-        cvn.SetChartNodeID(cn.GetID())
-
+        # # Configure properties of the Chart
+        # cn.SetProperty('default', 'title', 'A simple chart with 2 curves')
+        # cn.SetProperty('default', 'xAxisLabel', 'Something in x')
+        # cn.SetProperty('default', 'yAxisLabel', 'Something in y')
+        # cn.SetProperty('default', 'type', 'Bar')
+        # cn.SetProperty('Another double array', 'type', 'Line')
+        # cn.SetProperty('A double array', 'color', '#fe7d20')
+        # # Set the chart to display
+        # cvn.SetChartNodeID(cn.GetID())
+        #---------------------------------------
     # logic = ChartingLogic()
 
-        out = volumeNode.GetImageData()
-        print out
+        # out = volumeNode.GetImageData()
+        # print out
+        # new function for the first chart ----------------------------------------------------
+        cvn1 = cvns.get('ChartView1')
+        cvn2 = cvns.get('ChartView2')
+        cn1 = slicer.mrmlScene.AddNode(slicer.vtkMRMLChartNode())
+        cn1.SetProperty('default','cusWrapData',self.generateChartString('group','p1','g1'))
+        cvn1.SetChartNodeID(cn1.GetID())
 
+        cn2 = slicer.mrmlScene.AddNode(slicer.vtkMRMLChartNode())
+        cn2.SetProperty('default','cusWrapData',self.generateChartString('zscore','p1','g1'))
+        cvn2.SetChartNodeID(cn2.GetID())
+
+
+
+        
+       
     def onReload(self, moduleName='HelloChart'):
         """Generic reload method for any scripted module.
         ModuleWizard will subsitute correct default moduleName.
@@ -246,3 +260,178 @@ class HelloChartWidget:
             eval('globals()["%s"].%s(parent)' % (moduleName,
                  widgetName))
         globals()[widgetName.lower()].setup()
+
+    def generateChartString(self,charttype,pid,gid):
+        if charttype == "group":
+            print "group"
+            #each group only one instance is enough
+            groupChartDao = GroupChartDao(gid)
+            result = "var data = ["
+            result = result + self.generateDataString(groupChartDao.getPatientChartData(pid)) + "," + self.generateDataString(groupChartDao.getGroupChartData())+"];"
+            print "chart string:" + result
+            result = result + "var xAxisTicks = " + str(groupChartDao.getAreaList()) + ";"
+            print "chart string:" + result
+            optionStr = ''' var options = { highlighter: {
+                useAxesFormatters:false,
+                formatString:'%.3g,%.3g'
+
+            },
+            cursor: {
+                show: true,
+                zoom: true,
+            },
+            title:'Cortex Thickness Group Analysis Chart',
+            series:[
+                {
+                    pointLabels: {
+                        show: true
+                    },
+                    renderer: $.jqplot.BarRenderer,
+                    label: 'Volumes',
+            '''+self.generateColorString()+'''
+                    rendererOptions: {
+                        varyBarColor: true,
+                        barWidth: 15,
+                        barPadding: -15,
+                        barMargin: 0,
+                        highlightMouseOver: false
+                    }
+                }, 
+                {
+                    rendererOptions: {
+                    }
+                }
+            ],
+            axesDefaults: {
+                pad: 0
+            },
+            axes: {
+
+                xaxis: {
+                    label: 'Area Name',
+                    labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                    renderer: $.jqplot.CategoryAxisRenderer,
+                    ticks:xAxisTicks,
+                    tickRenderer: $.jqplot.CanvasAxisTickRenderer
+                },
+                yaxis: {
+                    label: 'Thickness(mm)',
+                    labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                    rendererOptions: {
+                        forceTickAt0: true
+                    }
+                }
+            },
+            grid: {
+                drawGridlines: true
+            },
+            legend: {
+                show: true,
+                labels:['Patient Data','Group Data']
+            }
+            }; '''
+            print "option string:" + optionStr
+            result += optionStr
+            return result
+
+        elif charttype == "zscore":
+            print "zscore"
+            zscoreChartDao = ZscoreChartDao(gid)
+            result = "var data = ["
+            result = result + self.generateDataString(zscoreChartDao.getZscore())+"];"
+            print "chart string:" + result
+            result = result + "var xAxisTicks = " + str(zscoreChartDao.getAreaList()) + ";"
+            print "chart string:" + result
+            optionStr = ''' var options = { highlighter: {
+                show: true, 
+                showLabel: true, 
+                tooltipAxes: 'y'
+            },
+            cursor: {
+                show: true,
+                zoom: true,
+            },
+            title:'Cortex Thickness Zscore Analysis Chart',
+            series:[
+                {
+                    rendererOptions: {
+                    }
+                }
+            ],
+            axesDefaults: {
+                pad: 0
+            },
+            axes: {
+
+                xaxis: {
+                    label: 'Area Name',
+                    labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                    renderer: $.jqplot.CategoryAxisRenderer,
+                    ticks:xAxisTicks,
+                    tickRenderer: $.jqplot.CanvasAxisTickRenderer
+                },
+                yaxis: {
+                    label: 'Zscore',
+                    labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                    rendererOptions: {
+                        forceTickAt0: true
+                    }
+                }
+            },
+            grid: {
+                drawGridlines: true
+            },
+            legend: {
+                show: true,
+                labels:['Zscore']
+            }
+            }; '''
+            print "option string:" + optionStr
+            result += optionStr
+            return result
+
+        else:
+            print 'error'
+            return ""  
+
+    def generateDataString(self,data):
+        result = "["
+        a = ","
+        print "data:"+str(data)
+        result = result + a.join(data) + "]"
+        return result
+
+    def generateColorString(self):
+        # sample: seriesColors: ['#dd8265', '#b17a65', '#6fb8d2', '#d8654f','#6fb8d2'],
+        return ""
+
+
+#create this class for save the file data in mem, use redis?
+class GroupChartDao:
+    def __init__ (self,gid):
+        self.gid = gid
+        print 'init group chart dao'
+    def getGroupChartData(self):
+        self.gdata = ['154.24','122.23','255.23','123.11','456.12','322.12']
+        return self.gdata 
+    def getPatientChartData(self,pid):
+        pdata = ['167.42','245.24','345.23','100.23','450.12','232.44']
+        return pdata
+    def getAreaList(self):
+        self.arealist = ['area1','area2','area3','area4','area5','area6']
+        return self.arealist
+
+
+class ZscoreChartDao:
+    def __init__ (self,gid):
+        self.gid = gid
+        print 'init zscore chart dao'
+    def getZscore(self):
+        self.gdata = ['-1.24','-2.23','1.23','2.11','1.12','2.12']
+        return self.gdata 
+    # def getPatientChartData(self,pid):
+    #     pdata = ['23.42','12.24','12.23','99.23','44.12','33.44']
+    #     return pdata
+    def getAreaList(self):
+        self.arealist = ['area1','area2','area3','area4','area5','area6']
+        return self.arealist

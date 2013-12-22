@@ -72,130 +72,6 @@ class HelloChartWidget:
     # Get the first ChartView node
 
         cvns = slicer.util.getNodes(pattern='vtkMRMLChartViewNode*')
-        #slicer.util.loadVolume('/Users/lichuan/Desktop/subjects/FA.nrrd')
-        #volumeNode = slicer.util.getNode(pattern='FA')
-
-        # # Create another data array
-        # dn3 = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
-        # a = dn3.GetArray()
-        # a.SetNumberOfTuples(12)
-        # x = range(0, 12)
-        # for i in range(len(x)):
-        #   a.SetComponent(i, 0, x[i]/4.0)
-        #   a.SetComponent(i, 1, math.sin(x[i]/4.0))
-        #   a.SetComponent(i, 2, 0)
-
-        # # Create another ChartNode
-        # cn = slicer.mrmlScene.AddNode(slicer.vtkMRMLChartNode())
-
-        # # Add data to the chart
-        # cn.AddArray('Periodic', dn3.GetID())
-
-        # # Configure properties of the Chart
-        # cn.SetProperty('default', 'title', 'A bar chart')
-        # cn.SetProperty('default', 'xAxisLabel', 'time')
-        # cn.SetProperty('default', 'yAxisLabel', 'velocity')
-        # cn.SetProperty('default', 'type', 'Bar');
-
-        # # Set the chart to display
-        # cvn.SetChartNodeID(cn.GetID())
-
-
-
-        #--------------
-
-
-        # dn6 = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
-        # a = dn6.GetArray()
-
-        # a.SetNumberOfTuples(40)
-        # for i in range(a.GetNumberOfTuples()):
-        #   a.SetComponent(i, 0, 1)
-        #   a.SetComponent(i, 1, (2.0*random.random() - 0.5) + 20.0)
-
-        # # Create another data array
-        # dn7 = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
-        # a = dn7.GetArray()
-
-        # a.SetNumberOfTuples(25)
-        # for i in range(20):
-        #   a.SetComponent(i, 0, 2)
-        #   a.SetComponent(i, 1, 2.0*(2.0*random.random()-1.0) + 27.0)
-        # for i in range(5):
-        #   a.SetComponent(20+i, 0, 2)
-        #   a.SetComponent(20+i, 1, 10.0*(2.0*random.random()-1.0) + 27.0)
-
-        # # Create another data array
-        # dn8 = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
-        # a = dn8.GetArray()
-
-        # a.SetNumberOfTuples(25)
-        # for i in range(20):
-        #   a.SetComponent(i, 0, 3)
-        #   a.SetComponent(i, 1, 3.0*(2.0*random.random()-1.0) + 24.0)
-        # for i in range(5):
-        #   a.SetComponent(20+i, 0, 2)
-        #   a.SetComponent(20+i, 1, 10.0*(2.0*random.random()-1.0) + 24.0)
-        
-        # # Create another ChartNode
-        # cn = slicer.mrmlScene.AddNode(slicer.vtkMRMLChartNode())
-
-        # # Add data to the chart
-        # cn.AddArray('Controls', dn6.GetID())
-        # cn.AddArray('Group A', dn7.GetID())
-        # cn.AddArray('Group B', dn8.GetID())
-
-        # # Configure properties of the Chart
-        # cn.SetProperty('default', 'title', 'A box chart')
-        # cn.SetProperty('default', 'xAxisLabel', 'population')
-        # cn.SetProperty('default', 'xAxisType', 'categorical')
-        # cn.SetProperty('default', 'yAxisLabel', 'size (ml)')
-        # cn.SetProperty('default', 'type', 'Box');
-
-        # # Set the chart to display
-        # cvn.SetChartNodeID(cn.GetID())
-        #-----------------
-         # Create arrays of data
-        # dn = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
-        # a = dn.GetArray()
-        # a.SetNumberOfTuples(600)
-        # x = range(0, 600)
-        # for i in range(len(x)):
-        #   a.SetComponent(i, 0, x[i]/50.0)
-        #   a.SetComponent(i, 1, math.sin(x[i]/50.0))
-        #   a.SetComponent(i, 2, 0)
-
-        # dn2 = slicer.mrmlScene.AddNode(slicer.vtkMRMLDoubleArrayNode())
-        # a = dn2.GetArray()
-        # a.SetNumberOfTuples(600)
-        # x = range(0, 600)
-        # for i in range(len(x)):
-        #   a.SetComponent(i, 0, x[i]/50.0)
-        #   a.SetComponent(i, 1, math.cos(x[i]/50.0))
-        #   a.SetComponent(i, 2, 0)
-
-        # # Create the ChartNode, 
-        # cn = slicer.mrmlScene.AddNode(slicer.vtkMRMLChartNode())
-
-        # # Add data to the Chart
-        # cn.AddArray('A double array', dn.GetID())
-        # cn.AddArray('Another double array', dn2.GetID())
-
-        # # Configure properties of the Chart
-        # cn.SetProperty('default', 'title', 'A simple chart with 2 curves')
-        # cn.SetProperty('default', 'xAxisLabel', 'Something in x')
-        # cn.SetProperty('default', 'yAxisLabel', 'Something in y')
-        # cn.SetProperty('default', 'type', 'Bar')
-        # cn.SetProperty('Another double array', 'type', 'Line')
-        # cn.SetProperty('A double array', 'color', '#fe7d20')
-        # # Set the chart to display
-        # cvn.SetChartNodeID(cn.GetID())
-        #---------------------------------------
-    # logic = ChartingLogic()
-
-        # out = volumeNode.GetImageData()
-        # print out
-        # new function for the first chart ----------------------------------------------------
         cvn1 = cvns.get('ChartView1')
         cvn2 = cvns.get('ChartView2')
         cn1 = slicer.mrmlScene.AddNode(slicer.vtkMRMLChartNode())
@@ -267,7 +143,7 @@ class HelloChartWidget:
             #each group only one instance is enough
             groupChartDao = GroupChartDao(gid)
             result = "var data = ["
-            result = result + self.generateDataString(groupChartDao.getPatientChartData(pid)) + "," + self.generateDataString(groupChartDao.getGroupChartData())+"];"
+            result = result + self.generateDataString(groupChartDao.getPatientChartData(pid)) + "," + self.generateDataString(groupChartDao.getGroupHighChartData())+","+self.generateDataString(groupChartDao.getGroupLowChartData())+"];"
             print "chart string:" + result
             result = result + "var xAxisTicks = " + str(groupChartDao.getAreaList()) + ";"
             print "chart string:" + result
@@ -278,10 +154,14 @@ class HelloChartWidget:
                 tooltipContentEditor:function (str,seriesIndex,pointIndex,plot) {
                     var label = plot.axes.xaxis._ticks[pointIndex*2+1].label;
                     if(seriesIndex == 1){
-                        return "Group data-"+label+":"+plot.data[seriesIndex][pointIndex]
+                        return "Group High-"+label+":"+plot.data[seriesIndex][pointIndex]
+                    }
+                    else if(seriesIndex == 2){
+                        return "Group Low-"+label+":"+plot.data[seriesIndex][pointIndex]
+
                     }
                     else{
-                        return "Patient data-"+label+":"+plot.data[seriesIndex][pointIndex]
+                        return "Patient-"+label+":"+plot.data[seriesIndex][pointIndex]
 
                     }                    
                 }
@@ -310,6 +190,12 @@ class HelloChartWidget:
                 }, 
                 {
                     rendererOptions: {
+                        smooth: true
+                    }
+                },
+                {
+                    rendererOptions: {
+                        smooth: true
                     }
                 }
             ],
@@ -338,7 +224,7 @@ class HelloChartWidget:
             },
             legend: {
                 show: true,
-                labels:['Patient Data','Group Data']
+                labels:['Patient Data','Group Data High','Group Data Low']
             }
             }; '''
             print "option string:" + optionStr
@@ -372,6 +258,7 @@ class HelloChartWidget:
             series:[
                 {
                     rendererOptions: {
+                        smooth: true
                     }
                 }
             ],
@@ -428,9 +315,12 @@ class GroupChartDao:
     def __init__ (self,gid):
         self.gid = gid
         print 'init group chart dao'
-    def getGroupChartData(self):
-        self.gdata = ['154.24','122.23','255.23','123.11','456.12','322.12']
-        return self.gdata 
+    def getGroupChartHighData(self):
+        self.ghdata = ['184.24','322.23','355.23','123.11','426.12','182.12']
+        return self.ghdata 
+    def getGroupChartLowData(self):
+        self.gldata = ['154.24','122.23','255.23','113.11','356.12','122.12']
+        return self.gldata 
     def getPatientChartData(self,pid):
         pdata = ['167.42','245.24','345.23','100.23','450.12','232.44']
         return pdata

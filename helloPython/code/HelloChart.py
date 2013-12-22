@@ -315,15 +315,19 @@ class GroupChartDao:
     def __init__ (self,gid):
         self.gid = gid
         print 'init group chart dao'
+#获取组分析数据的最高值，数据的组成是字符串的数组
     def getGroupChartHighData(self):
         self.ghdata = ['184.24','322.23','355.23','123.11','426.12','182.12']
         return self.ghdata 
+#获取组分析数据的最低值，数据的组成是字符串的数组
     def getGroupChartLowData(self):
         self.gldata = ['154.24','122.23','255.23','113.11','356.12','122.12']
         return self.gldata 
+#获取病人数据值
     def getPatientChartData(self,pid):
         pdata = ['167.42','245.24','345.23','100.23','450.12','232.44']
         return pdata
+#脑区对应的名称
     def getAreaList(self):
         self.arealist = ['area1','area2','area3','area4','area5','area6']
         return self.arealist
@@ -333,12 +337,11 @@ class ZscoreChartDao:
     def __init__ (self,gid):
         self.gid = gid
         print 'init zscore chart dao'
+#获得zscore数值
     def getZscore(self):
         self.gdata = ['-1.24','-2.23','1.23','2.11','1.12','2.12']
         return self.gdata 
-    # def getPatientChartData(self,pid):
-    #     pdata = ['23.42','12.24','12.23','99.23','44.12','33.44']
-    #     return pdata
+#脑区对应的名称
     def getAreaList(self):
         self.arealist = ['area1','area2','area3','area4','area5','area6']
         return self.arealist

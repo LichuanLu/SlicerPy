@@ -377,5 +377,7 @@ class ReadFile:
             strs = re.split(r'\s+',line)
             self.areaList.append(strs[0])
             self.thickAvgList.append(strs[4])
-        print elf.thickAvgList
+        print len(self.thickAvgList)
+        print len(self.areaList)
+
 

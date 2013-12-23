@@ -340,7 +340,7 @@ class GroupChartDao:
         return self.gldata 
 #获取病人数据值
     def getPatientChartData(self,pid):
-        return pdata
+        return self.pdata
     def setPatientChartData(self,data):
         self.pdata = data
 #脑区对应的名称

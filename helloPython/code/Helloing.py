@@ -138,14 +138,15 @@ class HelloingWidget:
         # slicer.util.loadScene("/Users/lichuan/Desktop/subjects/bert/slicerBertScene.mrml")
         base_path = "C:\\subjects"
         #add patient name and result in path
-        current_path = base_path + '/bert'
+        current_path = base_path + '/'+item.text(1)
         self.loadResultScene(current_path,True)
 
     def loadResultScene(self,path,init):     
         # if init , then clear the scene
         if init:
             slicer.mrmlScene.Clear(0)
-
+        ln = slicer.util.getNode(pattern='vtkMRMLLayoutNode*')
+        ln.SetViewArrangement(1)
         #load the volumn
         volumn_path = path + '/mri/brain.mgz'
         slicer.util.loadVolume(volumn_path)
@@ -255,10 +256,13 @@ class Patient:
         self.initResultList()
 
     def initResultList(self):
-        scan1 = ScanResult('2013-10-20', 'test path1')
-        scan2 = ScanResult('2012-11-21', 'test path2')
-        scan3 = ScanResult('2012-11-20', 'test path3')
+        scan1 = ScanResult('2013-10-20', 'bert')
+        scan2 = ScanResult('2012-11-21', 'bert')
+        scan3 = ScanResult('2012-11-20', 'bert')
+        scan4 = ScanResult('2011-11-20', 'bert')
         self.scan_result_list = []
         self.scan_result_list.append(scan1)
         self.scan_result_list.append(scan2)
         self.scan_result_list.append(scan3)
+        self.scan_result_list.append(scan4)
+

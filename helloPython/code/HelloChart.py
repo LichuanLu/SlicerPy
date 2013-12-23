@@ -143,7 +143,7 @@ class HelloChartWidget:
             #each group only one instance is enough
             groupChartDao = GroupChartDao(gid)
             result = "var data = ["
-            result = result + self.generateDataString(groupChartDao.getPatientChartData(pid)) + "," + self.generateDataString(groupChartDao.getGroupHighChartData())+","+self.generateDataString(groupChartDao.getGroupLowChartData())+"];"
+            result = result + self.generateDataString(groupChartDao.getPatientChartData(pid)) + "," + self.generateDataString(groupChartDao.getGroupChartHighData())+","+self.generateDataString(groupChartDao.getGroupChartLowData())+"];"
             print "chart string:" + result
             result = result + "var xAxisTicks = " + str(groupChartDao.getAreaList()) + ";"
             print "chart string:" + result

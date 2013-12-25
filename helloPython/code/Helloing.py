@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from __main__ import vtk, qt, ctk, slicer
-import sys
-sys.path.append('/dev_lic/SlicerPy/helloPython/code')
-import PatientDaoModule
+# import sys
+# sys.path.append('/dev_lic/SlicerPy/helloPython/code')
+# import PatientDaoModule
 
 # cannot import , need investigates
 # from PatientDao import PatientDao,ScanResult,Patient

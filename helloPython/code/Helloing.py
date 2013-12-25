@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from __main__ import vtk, qt, ctk, slicer
-
+import sys
+sys.path.append('/dev_lic/SlicerPy/helloPython/code')
+import PatientDaoModule
 
 # cannot import , need investigates
 # from PatientDao import PatientDao,ScanResult,Patient
@@ -136,7 +138,7 @@ class HelloingWidget:
     def onTreeItemDoubleClicked(self, item, index):
         print str(index) + ',' + item.text(0) + ',' + item.text(1)
         # slicer.util.loadScene("/Users/lichuan/Desktop/subjects/bert/slicerBertScene.mrml")
-        base_path = "C:\\subjects"
+        base_path = "C:\\subjects\\data"
         #add patient name and result in path
         current_path = base_path + '/'+item.text(1)
         self.loadResultScene(current_path,True)
@@ -148,6 +150,7 @@ class HelloingWidget:
         ln = slicer.util.getNode(pattern='vtkMRMLLayoutNode*')
         ln.SetViewArrangement(1)
         #load the volumn
+        print path
         volumn_path = path + '/mri/brain.mgz'
         slicer.util.loadVolume(volumn_path)
         #load model
@@ -256,10 +259,10 @@ class Patient:
         self.initResultList()
 
     def initResultList(self):
-        scan1 = ScanResult('2013-10-20', 'bert')
-        scan2 = ScanResult('2012-11-21', 'bert')
-        scan3 = ScanResult('2012-11-20', 'bert')
-        scan4 = ScanResult('2011-11-20', 'bert')
+        scan1 = ScanResult('2013-10-20', '45')
+        scan2 = ScanResult('2012-11-21', '47')
+        scan3 = ScanResult('2012-11-20', '48')
+        scan4 = ScanResult('2011-11-20', '49')
         self.scan_result_list = []
         self.scan_result_list.append(scan1)
         self.scan_result_list.append(scan2)

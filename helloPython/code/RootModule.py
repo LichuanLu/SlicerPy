@@ -57,7 +57,7 @@ class RootModuleWidget:
         # self.reloadButton.name = 'RootModule Reload'
         # self.layout.addWidget(self.reloadButton)
         # self.reloadButton.connect('clicked()', self.onReload)
-        # self.initMainPage()    
+        self.initMainPage()    
 
         # self.testedit = qt.QLineEdit(self)
         # self.testedit.name = "mytestedit"

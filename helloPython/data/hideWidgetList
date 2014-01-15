@@ -1,0 +1,2 @@
+ <addaction name="actionFileAddData"/>
+ <addaction name="actionFileSaveScene"/>

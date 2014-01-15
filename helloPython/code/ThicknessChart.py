@@ -9,37 +9,34 @@ import re
 
 
 #
-# HelloSharpen
+# ThicknessChart
 #
 
-class HelloChart:
+class ThicknessChart:
 
     def __init__(self, parent):
-        parent.title = 'HelloChart'
-        parent.categories = ['test']
+        parent.title = 'ThicknessChart'
+        parent.categories = ['BrainAS']
         parent.dependencies = []
-        parent.contributors = ['Jean-Christophe Fillion-Robin (Kitware)'
-                               , 'Steve Pieper (Isomics)',
-                               'Sonia Pujol (BWH)']  # replace with "Firstname Lastname (Org)"
+        parent.contributors = ['Lichuan Lu'
+                               , 'Xiang Li (Isomics)']  # replace with "Firstname Lastname (Org)"
         parent.helpText = \
             """
-    Example of scripted loadable extension for the HelloSharpen tutorial.
+    help text of ThicknessChart module
     """
         parent.acknowledgementText = \
             """
-    This file was originally developed by Jean-Christophe Fillion-Robin, Kitware Inc.,
-Steve Pieper, Isomics, Inc., and Sonia Pujol, Brigham and Women's Hospital and was 
-partially funded by NIH grant 3P41RR013218-12S1 (NAC) and is part of the National Alliance 
-for Medical Image Computing (NA-MIC), funded by the National Institutes of Health through the 
-NIH Roadmap for Medical Research, Grant U54 EB005149."""  # replace with organization, grant and thanks.
+    acknowledgementText of ThicknessChart module"""  # replace with organization, grant and thanks.
+        parent.icon = qt.QIcon(':Icons/Medium/SlicerAddScalarOverlay.png')
+
         self.parent = parent
 
 
 #
-# qHelloPythonWidget
+# qThicknessChartWidget
 #
 
-class HelloChartWidget:
+class ThicknessChartWidget:
 
     def __init__(self, parent=None):
         if not parent:
@@ -61,7 +58,7 @@ class HelloChartWidget:
 
         self.reloadButton = qt.QPushButton('Reload')
         self.reloadButton.toolTip = 'Reload this module.'
-        self.reloadButton.name = 'HelloChart Reload'
+        self.reloadButton.name = 'ThicknessChart Reload'
         self.layout.addWidget(self.reloadButton)
         self.reloadButton.connect('clicked()', self.onReload)
 
@@ -88,7 +85,7 @@ class HelloChartWidget:
 
         
        
-    def onReload(self, moduleName='HelloChart'):
+    def onReload(self, moduleName='ThicknessChart'):
         """Generic reload method for any scripted module.
         ModuleWizard will subsitute correct default moduleName.
         """

@@ -2,45 +2,40 @@
 # -*- coding: utf-8 -*-
 
 from __main__ import vtk, qt, ctk, slicer
-# import sys
-# sys.path.append('/dev_lic/SlicerPy/helloPython/code')
-# import PatientDaoModule
 
 # cannot import , need investigates
 # from PatientDao import PatientDao,ScanResult,Patient
 
 #
-# Helloing class
+# ThicknessAnalyze class
 #
 
-class Helloing:
+class ThicknessAnalyze:
 
     def __init__(self, parent):
-        parent.title = 'Helloing'
-        parent.categories = ['test1']
+        parent.title = 'ThicknessAnalyze'
+        parent.categories = ['BrainAS']
         parent.dependencies = []
-        parent.contributors = ['Jean-Christophe Fillion-Robin (Kitware)'
-                               , 'Steve Pieper (Isomics)',
-                               'Sonia Pujol (BWH)']  # replace with "Firstname Lastname (Org)"
+        parent.contributors = ['Lichuan Lu'
+                               , 'Xiang Li']  # replace with "Firstname Lastname (Org)"
         parent.helpText = \
             """
-    Example of scripted loadable extension for the HelloPython tutorial.
+    help text of ThicknessAnalyze module
     """
         parent.acknowledgementText = \
             """
-    This file was originally developed by Jean-Christophe Fillion-Robin, Kitware Inc.,
-Steve Pieper, Isomics, Inc., and Sonia Pujol, Brigham and Women's Hospital and was 
-partially funded by NIH grant 3P41RR013218-12S1 (NAC) and is part of the National Alliance 
-for Medical Image Computing (NA-MIC), funded by the National Institutes of Health through the 
-NIH Roadmap for Medical Research, Grant U54 EB005149."""  # replace with organization, grant and thanks.
+    acknowledgement Text of ThicknessAnalyze module."""  # replace with organization, grant and thanks.
+        parent.icon = qt.QIcon(':Icons/Medium/SlicerDownloadMRHead.png')
+
         self.parent = parent
 
 
+
 #
-# qHelloingWidget
+# qThicknessAnalyzeWidget
 #
 
-class HelloingWidget:
+class ThicknessAnalyzeWidget:
 
     def __init__(self, parent=None):
         if not parent:
@@ -60,7 +55,7 @@ class HelloingWidget:
 
         self.reloadButton = qt.QPushButton('Reload')
         self.reloadButton.toolTip = 'Reload this module.'
-        self.reloadButton.name = 'Helloing Reload'
+        self.reloadButton.name = 'ThicknessAnalyze Reload'
         self.layout.addWidget(self.reloadButton)
         self.reloadButton.connect('clicked()', self.onReload)
 
@@ -96,49 +91,49 @@ class HelloingWidget:
 
         self.layout.addStretch(1)
 
-    # Collapsible button
-    # sampleCollapsibleButton = ctk.ctkCollapsibleButton()
-    # sampleCollapsibleButton.text = "A collapsible button"
-    # self.layout.addWidget(sampleCollapsibleButton)
+    # # Collapsible button
+    # # sampleCollapsibleButton = ctk.ctkCollapsibleButton()
+    # # sampleCollapsibleButton.text = "A collapsible button"
+    # # self.layout.addWidget(sampleCollapsibleButton)
 
-    # Layout within the sample collapsible button
-    # sampleFormLayout = qt.QFormLayout(sampleCollapsibleButton)
+    # # Layout within the sample collapsible button
+    # # sampleFormLayout = qt.QFormLayout(sampleCollapsibleButton)
 
-    # HelloWorld button
-    # (Insert Section A text here)
-    # (be sure to match indentation of the rest of this
-    # code)
-    # HelloWorld button
+    # # HelloWorld button
+    # # (Insert Section A text here)
+    # # (be sure to match indentation of the rest of this
+    # # code)
+    # # HelloWorld button
 
-        helloWorldButton = qt.QPushButton('Hello world1')
-        helloWorldButton.toolTip = \
-            "Print 'Hello world' in standard ouput."
-        self.layout.addWidget(helloWorldButton)
-        helloWorldButton.connect('clicked(bool)',
-                                 self.onHelloWorldButtonClicked)
+    #     helloWorldButton = qt.QPushButton('Hello world1')
+    #     helloWorldButton.toolTip = \
+    #         "Print 'Hello world' in standard ouput."
+    #     self.layout.addWidget(helloWorldButton)
+    #     helloWorldButton.connect('clicked(bool)',
+    #                              self.onHelloWorldButtonClicked)
 
-    # Add vertical spacer
+    # # Add vertical spacer
 
-        self.layout.addStretch(1)
+    #     self.layout.addStretch(1)
 
-    # Set local var as instance attribute
+    # # Set local var as instance attribute
 
-        self.helloWorldButton = helloWorldButton
+    #     self.helloWorldButton = helloWorldButton
 
-    def onHelloWorldButtonClicked(self):
-        print 'Hello World !'
+    # def onHelloWorldButtonClicked(self):
+    #     print 'Hello World !'
 
-    # (Insert Section B text here)
-    # (be sure to match indentation of the rest of this
-    # code)
+    # # (Insert Section B text here)
+    # # (be sure to match indentation of the rest of this
+    # # code)
 
-        qt.QMessageBox.information(slicer.util.mainWindow(),
-                                   'Slicer Python', 'Hello World!')
+    #     qt.QMessageBox.information(slicer.util.mainWindow(),
+    #                                'Slicer Python', 'Hello World!')
 
     def onTreeItemDoubleClicked(self, item, index):
         print str(index) + ',' + item.text(0) + ',' + item.text(1)
         # slicer.util.loadScene("/Users/lichuan/Desktop/subjects/bert/slicerBertScene.mrml")
-        base_path = "C:\\subjects\\data"
+        base_path = "/Users/lichuan/Desktop/subjects"
         #add patient name and result in path
         current_path = base_path + '/'+item.text(1)
         self.loadResultScene(current_path,True)
@@ -180,7 +175,7 @@ class HelloingWidget:
         print success
 
 
-    def onReload(self, moduleName='Helloing'):
+    def onReload(self, moduleName='ThicknessAnalyze'):
         """Generic reload method for any scripted module.
     ModuleWizard will subsitute correct default moduleName.
     """
@@ -209,7 +204,7 @@ class HelloingWidget:
     # - find and hide the existing widget
     # - create a new widget in the existing parent
 
-        parent = slicer.util.findChildren(name='Helloing Reload'
+        parent = slicer.util.findChildren(name='ThicknessAnalyze Reload'
                 )[0].parent()
         for child in parent.children():
             try:
@@ -259,10 +254,10 @@ class Patient:
         self.initResultList()
 
     def initResultList(self):
-        scan1 = ScanResult('2013-10-20', '45')
-        scan2 = ScanResult('2012-11-21', '47')
-        scan3 = ScanResult('2012-11-20', '48')
-        scan4 = ScanResult('2011-11-20', '49')
+        scan1 = ScanResult('2013-10-20', 'bert')
+        scan2 = ScanResult('2012-11-21', 'bert')
+        scan3 = ScanResult('2012-11-20', 'bert')
+        scan4 = ScanResult('2011-11-20', 'bert')
         self.scan_result_list = []
         self.scan_result_list.append(scan1)
         self.scan_result_list.append(scan2)

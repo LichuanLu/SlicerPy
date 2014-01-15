@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from __main__ import vtk, qt, ctk, slicer
+from qt import QLabel
 
 import sys
 sys.path.append('/dev_lic/SlicerPy/helloPython/code')
@@ -51,15 +52,32 @@ class RootModuleWidget:
     # reload button
     # (use this during development, but remove it when delivering
     #  your module to users)  
-        self.reloadButton = qt.QPushButton('Reload')
-        self.reloadButton.toolTip = 'Reload this module.'
-        self.reloadButton.name = 'RootModule Reload'
-        self.layout.addWidget(self.reloadButton)
-        self.reloadButton.connect('clicked()', self.onReload)
-        self.initMainPage()      
+        # self.reloadButton = qt.QPushButton('Reload')
+        # self.reloadButton.toolTip = 'Reload this module.'
+        # self.reloadButton.name = 'RootModule Reload'
+        # self.layout.addWidget(self.reloadButton)
+        # self.reloadButton.connect('clicked()', self.onReload)
+        # self.initMainPage()    
+
         # self.testedit = qt.QLineEdit(self)
         # self.testedit.name = "mytestedit"
         # self.layout.addWidget(self.testedit)
+
+        self.font = qt.QFont()
+        self.font.setBold(True)
+        self.font.setPixelSize(20)
+        self.maintitle = QLabel("Welcome to BrainAS!")
+        self.maintitle.setFont(self.font)
+
+        # self.font2 = qt.QFont()
+        # self.font2.setBold(True)
+        # self.font2.setPixelSize(15)
+        # self.maintitle2 = QLabel("Please Enjoy it!")
+        # self.maintitle2.setFont(self.font2)
+
+
+        self.layout.addWidget(self.maintitle)
+        # self.layout.addWidget(self.maintitle2)
        
     def onReload(self, moduleName='RootModule'):
         """Generic reload method for any scripted module.

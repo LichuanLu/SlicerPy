@@ -53,15 +53,10 @@ class ThicknessAnalyzeWidget:
 
     # Instantiate and connect widgets ...
 
-        self.reloadButton = qt.QPushButton('Reload')
-        self.reloadButton.toolTip = 'Reload this module.'
-        self.reloadButton.name = 'ThicknessAnalyze Reload'
-        self.layout.addWidget(self.reloadButton)
-        self.reloadButton.connect('clicked()', self.onReload)
 
     # Add vertical spacer
 
-        self.layout.addStretch(1)
+        # self.layout.addStretch(1)
 
         self.qt_scan_result_list = qt.QTreeWidget()
 
@@ -89,8 +84,12 @@ class ThicknessAnalyzeWidget:
 
     # Add vertical spacer
 
-        self.layout.addStretch(1)
 
+        self.reloadButton = qt.QPushButton('Reload')
+        self.reloadButton.toolTip = 'Reload this module.'
+        self.reloadButton.name = 'ThicknessAnalyze Reload'
+        self.layout.addWidget(self.reloadButton)
+        self.reloadButton.connect('clicked()', self.onReload)
     # # Collapsible button
     # # sampleCollapsibleButton = ctk.ctkCollapsibleButton()
     # # sampleCollapsibleButton.text = "A collapsible button"

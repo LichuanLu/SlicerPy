@@ -56,11 +56,7 @@ class ThicknessChartWidget:
     # (use this during development, but remove it when delivering
     #  your module to users)
 
-        self.reloadButton = qt.QPushButton('Reload')
-        self.reloadButton.toolTip = 'Reload this module.'
-        self.reloadButton.name = 'ThicknessChart Reload'
-        self.layout.addWidget(self.reloadButton)
-        self.reloadButton.connect('clicked()', self.onReload)
+        
 
     # chart code
     # Change the layout to one that has a chart.  This created the ChartView
@@ -81,7 +77,11 @@ class ThicknessChartWidget:
         cn2.SetProperty('default','cusWrapData',self.generateChartString('zscore','p1','g1'))
         cvn2.SetChartNodeID(cn2.GetID())
 
-
+        self.reloadButton = qt.QPushButton('Reload')
+        self.reloadButton.toolTip = 'Reload this module.'
+        self.reloadButton.name = 'ThicknessChart Reload'
+        self.layout.addWidget(self.reloadButton)
+        self.reloadButton.connect('clicked()', self.onReload)
 
         
        

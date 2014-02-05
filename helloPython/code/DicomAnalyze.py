@@ -204,8 +204,12 @@ class DicomAnalyzeWidget:
                 if pExtendRow[4]:
                     age = pExtendRow[4]
                 else:
+                    cuPExtend.execute('SELECT StudyDate FROM Studies WHERE PatientsUID = ?',(pExtendRow[0],))
+                    resStudyDate = cuPExtend.fetchone()
                     birthdate = datetime.datetime.strptime(pExtendRow[2],'%Y-%m-%d')
-                    age = nowdate.year - birthdate.year
+                    studyDate = datetime.datetime.strptime(resStudyDate[0],'%Y-%m-%d')
+                    #age = nowdate.year - birthdate.year
+                    age = studyDate.year - birthdate.year
             #status 0 means not handle , 1 mean processing , 2 means done
                 foldername = str(pExtendRow[0])+'.'+pExtendRow[1]+'.'+str(time.mktime(nowdate.timetuple()))
                 #create folder to fs function should be attached to the function of processing, read folder name from database
@@ -226,6 +230,7 @@ class DicomAnalyzeWidget:
                 continue
         self.dbConnect.commit()
         cuPExtendInsert.close()
+        cuPExtend.close()
     # def changeGroupHandler(self,PUID):
     #     print "change group handler---"+str(PUID)
     # def changeStatusHanlder(self,PUID,Status):
@@ -300,10 +305,12 @@ class AllRecordTable(MyTable):
                     if m == 4:
                         #self.setBtnName(newBtn,'status',item)
                         newBtn.name = 'btnSARTable-%s-%s-%s'%(item[0],item[3],n)
-                        newBtn.setDisabled(False)
+                        #newBtn.setDisabled(False)
+                        newBtn.show()
                         btnText = "Start"
                         if item[3] == 1:
-                            newBtn.setDisabled(True)
+                            #newBtn.setDisabled(True)
+                            newBtn.hide()
                         elif item[3] == 2:
                             btnText = "Rerun"
                         newBtn.setText(btnText)                        
@@ -323,10 +330,12 @@ class AllRecordTable(MyTable):
 
         elif typeStr == 'status':
             newBtn.name = 'btnSARTable-%s-%s-%s'%(item[0],item[3],n)
-            newBtn.setDisabled(False)
+            #newBtn.setDisabled(False)
+            newBtn.show()
             btnText = "Start"
             if item[3] == 1:
-                newBtn.setDisabled(True)
+                #newBtn.setDisabled(True)
+                newBtn.hide()
             elif item[3] == 2:
                 btnText = "Rerun"
             newBtn.setText(btnText)
@@ -445,7 +454,8 @@ class QButton(QWidget):
                 self.parent().parent().cleanFolder(PUID)
             row = int(row)
             self.parent().parent().refreshTable(row,'status',1)
-            self.button.setDisabled(True)
+            #self.button.setDisabled(True)
+            self.button.hide()
             self.name = 'btnSARTable-%s-%s-%s'%(PUID,1,row)
             print "run freesurfer"
             self.parent().parent().runFreesurfer(PUID)

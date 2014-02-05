@@ -14,10 +14,10 @@ import re
 # ThicknessChart
 #
 
-class ThicknessChart:
+class ChartTest:
 
     def __init__(self, parent):
-        parent.title = 'ThicknessChart'
+        parent.title = 'ChartTest'
         parent.categories = ['BrainAS']
         parent.dependencies = []
         parent.contributors = ['Lichuan Lu'
@@ -38,7 +38,7 @@ class ThicknessChart:
 # qThicknessChartWidget
 #
 
-class ThicknessChartWidget:
+class ChartTestWidget:
 
     def __init__(self, parent=None):
         if not parent:
@@ -63,21 +63,29 @@ class ThicknessChartWidget:
     # chart code
     # Change the layout to one that has a chart.  This created the ChartView
 
-        ln = slicer.util.getNode(pattern='vtkMRMLLayoutNode*')
-        ln.SetViewArrangement(80)
+        # ln = slicer.util.getNode(pattern='vtkMRMLLayoutNode*')
+        # ln.SetViewArrangement(80)
 
     # Get the first ChartView node
 
-        cvns = slicer.util.getNodes(pattern='vtkMRMLChartViewNode*')
-        self.cvn1 = cvns.get('ChartView1')
-        self.cvn2 = cvns.get('ChartView2')
-        cn1 = slicer.mrmlScene.AddNode(slicer.vtkMRMLChartNode())
-        cn1.SetProperty('default','cusWrapData',self.generateChartString('group','p1','g1'))
-        self.cvn1.SetChartNodeID(cn1.GetID())
+        # cvns = slicer.util.getNodes(pattern='vtkMRMLChartViewNode*')
+        # cvn1 = cvns.get('ChartView1')
+        # cvn2 = cvns.get('ChartView2')
+        # cn1 = slicer.mrmlScene.AddNode(slicer.vtkMRMLChartNode())
+        # cn1.SetProperty('default','cusWrapData',self.generateChartString('group','p1','g1'))
+        # cvn1.SetChartNodeID(cn1.GetID())
 
-        cn2 = slicer.mrmlScene.AddNode(slicer.vtkMRMLChartNode())
-        cn2.SetProperty('default','cusWrapData',self.generateChartString('zscore','p1','g1'))
-        self.cvn2.SetChartNodeID(cn2.GetID())
+        # cn2 = slicer.mrmlScene.AddNode(slicer.vtkMRMLChartNode())
+        # cn2.SetProperty('default','cusWrapData',self.generateChartString('zscore','p1','g1'))
+        # cvn2.SetChartNodeID(cn2.GetID())
+
+        self.reloadButton = qt.QPushButton('Reload')
+        self.reloadButton.toolTip = 'Reload this module.'
+        self.reloadButton.name = 'ChartTest Reload'
+        self.layout.addWidget(self.reloadButton)
+        self.reloadButton.connect('clicked()', self.onReload)
+
+        #self.generateChartString('group','p1','g1')
 
 
         self.grid = qt.QGridLayout()
@@ -174,13 +182,8 @@ class ThicknessChartWidget:
 
 
 
-        self.reloadButton = qt.QPushButton('Reload')
-        self.reloadButton.toolTip = 'Reload this module.'
-        self.reloadButton.name = 'ThicknessChart Reload'
-        self.layout.addWidget(self.reloadButton)
-        self.reloadButton.connect('clicked()', self.onReload)
 
-   #TODO run the chart function
+    #TODO run the chart function
     def onTreeItemDoubleClicked(self,index):
         print "onTreeItemDoubleClicked"
 
@@ -216,9 +219,11 @@ class ThicknessChartWidget:
     def onSearchClicked(self):
         print "search click"
         self.normalRecordListRefresh()
-        
+    
+    # def onSexActivated(self,text):
+    #     print "sex:"+text
        
-    def onReload(self, moduleName='ThicknessChart'):
+    def onReload(self, moduleName='ChartTest'):
         """Generic reload method for any scripted module.
         ModuleWizard will subsitute correct default moduleName.
         """
@@ -282,11 +287,8 @@ class ThicknessChartWidget:
                 colorList.append(overLowColor)
             else:
                 colorList.append(normalColor)
-        if len(colorList) > 0:
-            resString = 'seriesColors:'+ self.generateDataString(colorList)+','
-        else:
-            resString = ""
-
+        print "colorlist:"+str(colorList)
+        resString = 'seriesColors:'+ self.generateDataString(colorList)+','
         print "color string:"+resString
         return resString
 
@@ -344,7 +346,6 @@ class ThicknessChartWidget:
                         barPadding: -15,
                         barMargin: 0,
                         highlightMouseOver: false
-
                     }
                 }, 
                 {
@@ -545,11 +546,11 @@ class PatientDao:
         cu = BaseDAO.ctkDicomConnect.cursor()
         try:
             if sex == 'All':
-                cu.execute("SELECT Patient_UID,PatientsName,PatientsAGE,PatientsSex,Foldername FROM Patients_extend where Status = 2 and PatientsAge <= ? and PatientsAge >= ? and IsNormal = 1 limit ?",(agehigh,agelow,count,))
+                cu.execute("SELECT Patient_UID,PatientsName,PatientsAGE,PatientsSex,Foldername FROM Patients_extend where Status = 2 and PatientsAge <= ? and PatientsAge >= ? and IsNormal=1 limit ?",(agehigh,agelow,count))
             elif sex == 'Male':
-                cu.execute("SELECT Patient_UID,PatientsName,PatientsAGE,PatientsSex,Foldername FROM Patients_extend where Status = 2 and PatientsAge <= ? and PatientsAge >= ? and PatientsSex = 'M' and IsNormal=1  limit ?",(agehigh,agelow,count,))
+                cu.execute("SELECT Patient_UID,PatientsName,PatientsAGE,PatientsSex,Foldername FROM Patients_extend where Status = 2 and PatientsAge <= ? and PatientsAge >= ? and PatientsSex = 'M' and IsNormal=1 limit ?",(agehigh,agelow,count))
             elif sex == 'Female':
-                cu.execute("SELECT Patient_UID,PatientsName,PatientsAGE,PatientsSex,Foldername FROM Patients_extend where Status = 2 and PatientsAge <= ? and PatientsAge >= ? and PatientsSex = 'F' and IsNormal=1 limit ?",(agehigh,agelow,count,))
+                cu.execute("SELECT Patient_UID,PatientsName,PatientsAGE,PatientsSex,Foldername FROM Patients_extend where Status = 2 and PatientsAge <= ? and PatientsAge >= ? and PatientsSex = 'F' and IsNormal=1 limit ?",(agehigh,agelow,count))
 
             res = cu.fetchall()
             return res
@@ -588,5 +589,4 @@ class PatientDao:
             return 'Normal'
         else:
             return ''
-
 

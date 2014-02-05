@@ -2,6 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from __main__ import vtk, qt, ctk, slicer
+from qt import QLabel
+from DicomDAO import BaseDAO
+from BrainASUtils import PathDao
+
 
 # cannot import , need investigates
 # from PatientDao import PatientDao,ScanResult,Patient
@@ -57,19 +61,26 @@ class ThicknessAnalyzeWidget:
     # Add vertical spacer
 
         # self.layout.addStretch(1)
+        self.font = qt.QFont()
+        self.font.setBold(True)
+        self.font.setPixelSize(15)
+        self.listTitle = QLabel("Record List:")
+        self.listTitle.setFont(self.font)
+
+        self.layout.addWidget(self.listTitle)
 
         self.qt_scan_result_list = qt.QTreeWidget()
 
     # descending order as default
 
         self.qt_scan_result_list.setSortingEnabled(1)
-        self.qt_scan_result_list.setHeaderLabels(['name', 'file_path'])
+        self.qt_scan_result_list.setHeaderLabels(['PUID','Name','Age','Group'])
         patient_dao = PatientDao()
         scan_results = patient_dao.getSResultList()
         item_list = []
         for result in scan_results:
-            print result.name + ',' + result.file_path
-            item = qt.QTreeWidgetItem([result.name, result.file_path])
+            #print str(result[0]) + ',' + result[1]+','+result[2]+','+result[3]
+            item = qt.QTreeWidgetItem([result[0], result[1],result[2],result[3]])
             item_list.append(item)
 
         # item.content = result
@@ -132,10 +143,36 @@ class ThicknessAnalyzeWidget:
     def onTreeItemDoubleClicked(self, item, index):
         print str(index) + ',' + item.text(0) + ',' + item.text(1)
         # slicer.util.loadScene("/Users/lichuan/Desktop/subjects/bert/slicerBertScene.mrml")
-        base_path = "/Users/lichuan/Desktop/subjects"
-        #add patient name and result in path
-        current_path = base_path + '/'+item.text(1)
-        self.loadResultScene(current_path,True)
+        cu = BaseDAO.ctkDicomConnect.cursor()
+        try:
+            cu.execute('SELECT Foldername FROM Patients_extend where Patient_UID = ?',(int(item.text(0)),))
+            res = cu.fetchone()
+
+
+            # print "clearn"+str(res)
+            # folder = PathDao.freesurferPath+res[0]
+            # print folder
+            # fsFolder = folder+'/data'
+            # # for the_file in os.listdir(folder):
+            # #     file_path = os.path.join(folder, the_file)
+            # shutil.rmtree(fsFolder) 
+            # # tempFilepath = folder+'/'+PathDao.tempfileName
+            # # tempfile = open(tempFilepath, 'a')
+            # # tempfile.truncate()
+            # if not os.path.exists(fsFolder): os.makedirs(fsFolder)
+
+            folder = PathDao.freesurferPath+res[0]+'/data'
+            #add patient name and result in path
+            current_path = folder + '/'+'bert'
+            self.loadResultScene(current_path,True)
+        except:
+            print 'get patients extend list error'
+            traceback.print_exc()
+        finally:
+            cu.close()
+
+
+     
 
     def loadResultScene(self,path,init):     
         # if init , then clear the scene
@@ -233,33 +270,92 @@ class PatientDao:
     def __init__(self):
         print 'init PatientDAO'
 
+    #TODO 
+    #update the sql
+    def getNormalList(self,agelow,agehigh,sex,count):
+        print str(agelow)+","+str(agehigh)+","+sex+","+str(count)
+        cu = BaseDAO.ctkDicomConnect.cursor()
+        try:
+            if sex == 'All':
+                cu.execute("SELECT Patient_UID,PatientsName,PatientsAGE,PatientsSex,Foldername FROM Patients_extend where Status = 2 and PatientsAge <= ? and PatientsAge >= ? and IsNormal=1  limit ?",(agehigh,agelow,count,))
+            elif sex == 'Male':
+                cu.execute("SELECT Patient_UID,PatientsName,PatientsAGE,PatientsSex,Foldername FROM Patients_extend where Status = 2 and PatientsAge <= ? and PatientsAge >= ? and PatientsSex = 'M' and IsNormal=1  limit ?",(agehigh,agelow,count,))
+            elif sex == 'Female':
+                cu.execute("SELECT Patient_UID,PatientsName,PatientsAGE,PatientsSex,Foldername FROM Patients_extend where Status = 2 and PatientsAge <= ? and PatientsAge >= ? and PatientsSex = 'F' and IsNormal=1  limit ?",(agehigh,agelow,count,))
+
+            res = cu.fetchall()
+            return res
+        except:
+            print 'get normal list error'
+            traceback.print_exc()
+        finally:
+            cu.close()
+
     def getSResultList(self):
-        self.patient = Patient('Li Gang')
-        return self.patient.scan_result_list
+        cu = BaseDAO.ctkDicomConnect.cursor()
+        try:
+            cu.execute('SELECT Patient_UID,PatientsName,PatientsAGE,IsNormal FROM Patients_extend where Status = 2')
+            res = cu.fetchall()
+            resList = []
+            # cannot update tuple using this way , have to update the list component to display text or change the tuple to list
+            for resData in res:
+                resData = list(resData)
+                text = self.getGroupText(resData[3])
+                print "group text:"+text
+                resData[3] = text 
+                resList.append(resData)
 
 
-class ScanResult:
+            # print "clearn"+str(res)
+            # folder = PathDao.freesurferPath+res[0]
+            # print folder
+            # fsFolder = folder+'/data'
+            # # for the_file in os.listdir(folder):
+            # #     file_path = os.path.join(folder, the_file)
+            # shutil.rmtree(fsFolder) 
+            # # tempFilepath = folder+'/'+PathDao.tempfileName
+            # # tempfile = open(tempFilepath, 'a')
+            # # tempfile.truncate()
+            # if not os.path.exists(fsFolder): os.makedirs(fsFolder)
+            return resList
+        except:
+            print 'get patients extend list error'
+            traceback.print_exc()
+        finally:
+            cu.close()
+        # self.patient = Patient('Li Gang')
+        # return self.patient.scan_result_list
 
-    def __init__(self, name, file_path):
-        self.name = name
-        self.file_path = file_path
-        print 'init ScanResult'
+    def getGroupText(self,code):
+        if code == 0:
+            return 'Patient'
+        elif code == 1:
+            return 'Normal'
+        else:
+            return ''
+
+# class ScanResult:
+
+#     def __init__(self, name, file_path):
+#         self.name = name
+#         self.file_path = file_path
+#         print 'init ScanResult'
 
 
-class Patient:
+# class Patient:
 
-    def __init__(self, name):
-        self.name = name
-        self.initResultList()
+#     def __init__(self, name):
+#         self.name = name
+#         self.initResultList()
 
-    def initResultList(self):
-        scan1 = ScanResult('2013-10-20', 'bert')
-        scan2 = ScanResult('2012-11-21', 'bert')
-        scan3 = ScanResult('2012-11-20', 'bert')
-        scan4 = ScanResult('2011-11-20', 'bert')
-        self.scan_result_list = []
-        self.scan_result_list.append(scan1)
-        self.scan_result_list.append(scan2)
-        self.scan_result_list.append(scan3)
-        self.scan_result_list.append(scan4)
+#     def initResultList(self):
+#         scan1 = ScanResult('2013-10-20', 'bert')
+#         scan2 = ScanResult('2012-11-21', 'bert')
+#         scan3 = ScanResult('2012-11-20', 'bert')
+#         scan4 = ScanResult('2011-11-20', 'bert')
+#         self.scan_result_list = []
+#         self.scan_result_list.append(scan1)
+#         self.scan_result_list.append(scan2)
+#         self.scan_result_list.append(scan3)
+#         self.scan_result_list.append(scan4)
 

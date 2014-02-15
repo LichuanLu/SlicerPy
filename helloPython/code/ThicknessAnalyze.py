@@ -163,7 +163,7 @@ class ThicknessAnalyzeWidget:
 
             folder = PathDao.freesurferPath+res[0]+'/data'
             #add patient name and result in path
-            current_path = folder + '/'+'bert'
+            current_path = folder + '/'+'patient'
             self.loadResultScene(current_path,True)
         except:
             print 'get patients extend list error'
@@ -176,26 +176,31 @@ class ThicknessAnalyzeWidget:
 
     def loadResultScene(self,path,init):     
         # if init , then clear the scene
-        if init:
-            slicer.mrmlScene.Clear(0)
-        ln = slicer.util.getNode(pattern='vtkMRMLLayoutNode*')
-        ln.SetViewArrangement(1)
-        #load the volumn
-        print path
-        volumn_path = path + '/mri/brain.mgz'
-        slicer.util.loadVolume(volumn_path)
-        #load model
-        lh_model_path = path + '/surf/lh.white'
-        rh_model_path = path + '/surf/rh.white'
-        # self.loadResultModel(lh_model_path)
-        # self.loadResultModel(rh_model_path)
-        #load label
-        lh_label_path = path + '/label/lh.aparc.annot'
-        rh_label_path = path + '/label/rh.aparc.annot'
-        # self.loadResultLabel(lh_label_path,'lh')
-        # self.loadResultLabel(rh_label_path,'rh')
-        self.loadResultModel(lh_model_path,lh_label_path,'lh')
-        self.loadResultModel(rh_model_path,rh_label_path,'rh')
+        try:
+
+            if init:
+                slicer.mrmlScene.Clear(0)
+            ln = slicer.util.getNode(pattern='vtkMRMLLayoutNode*')
+            ln.SetViewArrangement(1)
+            #load the volumn
+            print path
+            volumn_path = path + '/mri/brain.mgz'
+            slicer.util.loadVolume(volumn_path)
+            #load model
+            lh_model_path = path + '/surf/lh.white'
+            rh_model_path = path + '/surf/rh.white'
+            # self.loadResultModel(lh_model_path)
+            # self.loadResultModel(rh_model_path)
+            #load label
+            lh_label_path = path + '/label/lh.aparc.annot'
+            rh_label_path = path + '/label/rh.aparc.annot'
+            # self.loadResultLabel(lh_label_path,'lh')
+            # self.loadResultLabel(rh_label_path,'rh')
+            self.loadResultModel(lh_model_path,lh_label_path,'lh')
+            self.loadResultModel(rh_model_path,rh_label_path,'rh')
+        except:
+            print 'load error'
+            traceback.print_exc()
 
         
     def loadResultModel(self,mpath,lpath,name):   

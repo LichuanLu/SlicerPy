@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from __main__ import vtk, qt, ctk, slicer
 from DicomDAO import BaseDAO
+from BrainASUtils import PathDao
 
 import Charting
 import math
@@ -68,16 +69,24 @@ class ThicknessChartWidget:
 
     # Get the first ChartView node
 
-        cvns = slicer.util.getNodes(pattern='vtkMRMLChartViewNode*')
-        self.cvn1 = cvns.get('ChartView1')
-        self.cvn2 = cvns.get('ChartView2')
-        cn1 = slicer.mrmlScene.AddNode(slicer.vtkMRMLChartNode())
-        cn1.SetProperty('default','cusWrapData',self.generateChartString('group','p1','g1'))
-        self.cvn1.SetChartNodeID(cn1.GetID())
+        # cvns = slicer.util.getNodes(pattern='vtkMRMLChartViewNode*')
+        # cvn1 = cvns.get('ChartView1')
+        # cvn2 = cvns.get('ChartView2')
+        # cn1 = slicer.mrmlScene.AddNode(slicer.vtkMRMLChartNode())
+        # cn1.SetProperty('default','cusWrapData',self.generateChartString('group','p1','g1'))
+        # cvn1.SetChartNodeID(cn1.GetID())
 
-        cn2 = slicer.mrmlScene.AddNode(slicer.vtkMRMLChartNode())
-        cn2.SetProperty('default','cusWrapData',self.generateChartString('zscore','p1','g1'))
-        self.cvn2.SetChartNodeID(cn2.GetID())
+        # cn2 = slicer.mrmlScene.AddNode(slicer.vtkMRMLChartNode())
+        # cn2.SetProperty('default','cusWrapData',self.generateChartString('zscore','p1','g1'))
+        # cvn2.SetChartNodeID(cn2.GetID())
+
+        self.reloadButton = qt.QPushButton('Reload')
+        self.reloadButton.toolTip = 'Reload this module.'
+        self.reloadButton.name = 'ChartTest Reload'
+        self.layout.addWidget(self.reloadButton)
+        self.reloadButton.connect('clicked()', self.onReload)
+
+        #self.generateChartString('group','p1','g1')
 
 
         self.grid = qt.QGridLayout()
@@ -171,16 +180,98 @@ class ThicknessChartWidget:
                 , self.onTreeItemDoubleClicked)
         self.layout.addWidget(self.qt_scan_result_list)
 
+    # add two button for left brain and right brain and one label for the result
+
+        self.chartHandleLabel = qt.QLabel("")
+        self.chartHandleLabel.setStyleSheet('color: red')
+        self.layout.addWidget(self.chartHandleLabel)
+
+        self.buttonLayout = qt.QHBoxLayout()
+
+        self.leftBrainBtn = qt.QPushButton('Left Brain Analyze')
+        self.leftBrainBtn.toolTip = 'Left Brain Analyze'
+        self.leftBrainBtn.name = 'Left-Brain-Analyze-Button'
+        self.buttonLayout.addWidget(self.leftBrainBtn)
+        self.leftBrainBtn.connect('clicked()', self.leftBrainBtnClicked)
+
+        self.rightBrainBtn = qt.QPushButton('Right Brain Analyze')
+        self.rightBrainBtn.toolTip = 'Right Brain Analyze'
+        self.rightBrainBtn.name = 'Right-Brain-Analyze-Button'
+        self.buttonLayout.addWidget(self.rightBrainBtn)
+        self.rightBrainBtn.connect('clicked()', self.rightBrainBtnClicked)
+
+        self.layout.addLayout(self.buttonLayout)
+
+    def leftBrainBtnClicked(self):
+        print "leftBrainBtnClicked"
+        self.chartHandleLabel.setText("")
+        selectedItem = self.qt_scan_result_list.currentItem()
+        try:
+            pid = int(selectedItem.text(0))
+            print str(selectedItem.text(0))
+            print str(selectedItem.text(1))
+        except:
+            print "Warning: Please select one record from the Patient record list"
+            self.chartHandleLabel.setText("Warning: Please select one record from the Patient record list!")
+            traceback.print_exc()
+            return
+        try:
+            self.brainChartAnalyze("Left",pid)
+        except:
+            self.chartHandleLabel.setText("Error:brainChartAnalyze left")
+            traceback.print_exc()
+        self.chartHandleLabel.setText("Success:Analyze Left Brain")
+
+    def rightBrainBtnClicked(self):
+        print "rightBrainBtnClicked"
+        self.chartHandleLabel.setText("")
+        selectedItem = self.qt_scan_result_list.currentItem()
+        try:
+            pid = int(selectedItem.text(0))
+            print str(selectedItem.text(0))
+            print str(selectedItem.text(1))
+        except:
+            print "Warning: Please select one record from the Patient record list"
+            self.chartHandleLabel.setText("Warning: Please select one record from the Patient record list!")
+            traceback.print_exc()
+            return
+        try:
+            self.brainChartAnalyze("Right",pid) 
+        except:
+            self.chartHandleLabel.setText("Error:brainChartAnalyze right")
+            traceback.print_exc()
+        self.chartHandleLabel.setText("Success:Analyze Right Brain")
 
 
+    def brainChartAnalyze(self,brainType,pid):
+        print brainType+","+str(pid)
+        gid = []
 
-        self.reloadButton = qt.QPushButton('Reload')
-        self.reloadButton.toolTip = 'Reload this module.'
-        self.reloadButton.name = 'ThicknessChart Reload'
-        self.layout.addWidget(self.reloadButton)
-        self.reloadButton.connect('clicked()', self.onReload)
 
-   #TODO run the chart function
+        root = self.qt_scan_result_list.invisibleRootItem()
+        child_count = root.childCount()
+        for i in range(child_count):
+            item = root.child(i)
+            item_id = item.text(0) # text at first (0) column
+            print str(item_id)
+            gid.append(int(item_id))
+
+
+        gdata = GroupData(gid)   
+
+
+        cvns = slicer.util.getNodes(pattern='vtkMRMLChartViewNode*')
+        self.cvn1 = cvns.get('ChartView1')
+        self.cvn2 = cvns.get('ChartView2')
+        cn1 = slicer.mrmlScene.AddNode(slicer.vtkMRMLChartNode())
+        cn1.SetProperty('default','cusWrapData',self.generateChartString('group',pid,gdata,brainType))
+        self.cvn1.SetChartNodeID(cn1.GetID())
+
+        cn2 = slicer.mrmlScene.AddNode(slicer.vtkMRMLChartNode())
+        cn2.SetProperty('default','cusWrapData',self.generateChartString('zscore',pid,gdata,brainType))
+        self.cvn2.SetChartNodeID(cn2.GetID())
+
+    #TODO run the chart function
     def onTreeItemDoubleClicked(self,index):
         print "onTreeItemDoubleClicked"
 
@@ -216,7 +307,9 @@ class ThicknessChartWidget:
     def onSearchClicked(self):
         print "search click"
         self.normalRecordListRefresh()
-        
+    
+    # def onSexActivated(self,text):
+    #     print "sex:"+text
        
     def onReload(self, moduleName='ThicknessChart'):
         """Generic reload method for any scripted module.
@@ -273,7 +366,7 @@ class ThicknessChartWidget:
     def generateColorList(self,highList,lowList,dataList):
         overHighColor = '#FF0000'
         overLowColor = '#0000FF'
-        normalColor = '#85802b'
+        normalColor = '#C5B47F'
         colorList = []
         for index,item in enumerate(dataList):
             if(float(item) > float(highList[index])):
@@ -283,25 +376,51 @@ class ThicknessChartWidget:
             else:
                 colorList.append(normalColor)
         if len(colorList) > 0:
-            resString = 'seriesColors:'+ self.generateDataString(colorList)+','
+            resString = 'seriesColors:'+ str(colorList)+','
         else:
             resString = ""
-
         print "color string:"+resString
         return resString
 
 
-    def generateChartString(self,charttype,pid,gid):
-        pfileData = ReadFile("C:\\subjects\\lh.aparc.a2009s.stats")
-        pfileData.parseFile()
+    def generateChartString(self,charttype,pid,gdata,brainType):
+        cu = BaseDAO.ctkDicomConnect.cursor()
+        pfileData = ""
+        print "brainType:"+brainType
+        try:
+            cu.execute('SELECT Foldername FROM Patients_extend where Patient_UID = ?',(pid,))
+            res = cu.fetchone()
+            print "generateChartString res pid:"+str(res)+","+str(pid)
+            if res:
+                if brainType == "Left":
+                    path = PathDao.freesurferPath+res[0]+"/data/patient/stats/lh.aparc.a2009s.stats"
+                    print "patient path:"+path
+                    pfileData = ReadFile(path)
+                elif brainType == "Right":
+                    path = PathDao.freesurferPath+res[0]+"/data/patient/stats/rh.aparc.a2009s.stats"
+                    print "patient path:"+path
+                    pfileData = ReadFile(path)
+
+        except:
+            print 'generateChartString error'
+            traceback.print_exc()
+            return
+        finally:
+            cu.close()
+        print "generateChartString pfileData:"+str(len(pfileData.thickAvgList))
+        # gdata = GroupData(gid)   
         if charttype == "group":
             print "group"
             #each group only one instance is enough
-            groupChartDao = GroupChartDao(gid)
+            groupChartDao = GroupChartDao(gdata)
             groupChartDao.setPatientChartData(pfileData.thickAvgList)
             groupChartDao.setAreaList(pfileData.areaList)
+            localPatientChartData = groupChartDao.getPatientChartData(pid)
+            localGroupChartHighData = groupChartDao.getGroupChartHighData(brainType)
+            localGroupChartLowData = groupChartDao.getGroupChartLowData(brainType)
+
             result = "var data = ["
-            result = result + self.generateDataString(groupChartDao.getPatientChartData(pid)) + "," + self.generateDataString(groupChartDao.getGroupChartHighData())+","+self.generateDataString(groupChartDao.getGroupChartLowData())+"];"
+            result = result + self.generateDataString(localPatientChartData) + "," + self.generateDataString(localGroupChartHighData)+","+self.generateDataString(localGroupChartLowData)+"];"
             print "chart string:" + result
             result = result + "var xAxisTicks = " + str(groupChartDao.getAreaList()) + ";"
             print "chart string:" + result
@@ -330,7 +449,7 @@ class ThicknessChartWidget:
                 zoom: true,
             },
             title:'Cortex Thickness Group Analysis Chart',
-            '''+self.generateColorList(groupChartDao.getGroupChartHighData(),groupChartDao.getGroupChartLowData(),groupChartDao.getPatientChartData(pid))+'''
+            '''+self.generateColorList(localGroupChartHighData,localGroupChartLowData,localPatientChartData)+'''
             series:[
                 {
                     pointLabels: {
@@ -344,16 +463,17 @@ class ThicknessChartWidget:
                         barPadding: -15,
                         barMargin: 0,
                         highlightMouseOver: false
-
                     }
                 }, 
                 {
                     rendererOptions: {
+                        color:'#4BB2C5',
                         smooth: true
                     }
                 },
                 {
                     rendererOptions: {
+                        color:'#EAA228',
                         smooth: true
                     }
                 }
@@ -395,7 +515,7 @@ class ThicknessChartWidget:
 
         elif charttype == "zscore":
             print "zscore"
-            zscoreChartDao = ZscoreChartDao(gid)
+            zscoreChartDao = ZscoreChartDao(gdata)
             zscoreChartDao.setAreaList(pfileData.areaList)
             result = "var data = ["
             result = result + self.generateDataString(zscoreChartDao.getZscore())+"];"
@@ -476,20 +596,81 @@ class ThicknessChartWidget:
         return ""
 
 
-#create this class for save the file data in mem, use redis?
-class GroupChartDao:
+class GroupData:
     def __init__ (self,gid):
         self.gid = gid
+        self.leftFiles = []
+        self.rightFiles = []
         print 'init group chart dao'
+        if (len(self.gid) > 0):
+            cu = BaseDAO.ctkDicomConnect.cursor()
+            try:
+                sql="SELECT Foldername FROM Patients_extend where Patient_UID in ({seq})".format(seq=','.join(['?']*len(gid)))
+                print "GroupData sql:"+sql
+                cu.execute(sql, gid)
+                res = cu.fetchall()
+                if len(res) > 0:
+                    for gfolder in res:
+                        self.leftFiles.append(ReadFile(PathDao.freesurferPath+gfolder[0]+"/data/patient/stats/lh.aparc.a2009s.stats"))
+                        self.rightFiles.append(ReadFile(PathDao.freesurferPath+gfolder[0]+"/data/patient/stats/rh.aparc.a2009s.stats"))
+            except:
+                print 'get normal list error'
+                #traceback.print_exc()
+            finally:
+                cu.close()
+                print "GroupData:"+str(len(self.leftFiles))+","+str(len(self.rightFiles))
+
+#create this class for save the file data in mem, use redis?
+class GroupChartDao:
+    def __init__ (self,gdata):
+        self.gdata = gdata
 #获取组分析数据的最高值，数据的组成是字符串的数组
-    def getGroupChartHighData(self):
-        self.ghdata = ['3.358','4.23','5.23','4.11','3.12','4.12','3.358','4.23','5.23','4.11','3.12','4.12','3.358','4.23','5.23','4.11','3.12','4.12','3.358','4.23','5.23','4.11','3.12','4.12','3.358','4.23','5.23','4.11','3.12','4.12','3.358','4.23','5.23','4.11','3.12','4.12','3.358','4.23','5.23','4.11','3.12','4.12','3.358','4.23','5.23','4.11','3.12','4.12','3.358','4.23','5.23','4.11','3.12','4.12','3.358','4.23','5.23','4.11','3.12','4.12','3.358','4.23','5.23','4.11','3.12','4.12','3.358','4.23','5.23','4.11','3.12','4.12','4.33']
-        print len(self.ghdata)
+    def getGroupChartHighData(self,brainType):
+        try:
+            if brainType == "Left":
+                fileList = self.gdata.leftFiles
+                length = len(fileList[0].thickAvgList)
+            elif brainType == "Right":
+                fileList = self.gdata.rightFiles
+                length = len(fileList[0].thickAvgList)
+            print "lenght:"+str(length)
+            self.ghdata = []
+            for i in range(length):
+                temp = 0
+                for datafile in fileList:
+                    tempData = float(datafile.thickAvgList[i])
+                    if tempData > temp:
+                        temp = tempData
+                self.ghdata.append(str(temp))
+        except:
+            print "getGroupChartHighData error"
+            traceback.print_exc()
+            self.ghdata = ['3.358','4.23','5.23','4.11','3.12','4.12','3.358','4.23','5.23','4.11','3.12','4.12','3.358','4.23','5.23','4.11','3.12','4.12','3.358','4.23','5.23','4.11','3.12','4.12','3.358','4.23','5.23','4.11','3.12','4.12','3.358','4.23','5.23','4.11','3.12','4.12','3.358','4.23','5.23','4.11','3.12','4.12','3.358','4.23','5.23','4.11','3.12','4.12','3.358','4.23','5.23','4.11','3.12','4.12','3.358','4.23','5.23','4.11','3.12','4.12','3.358','4.23','5.23','4.11','3.12','4.12','3.358','4.23','5.23','4.11','3.12','4.12','4.33']
+        print "self.ghdata:"+str(len(self.ghdata)) 
         return self.ghdata 
 #获取组分析数据的最低值，数据的组成是字符串的数组
-    def getGroupChartLowData(self):
-        self.gldata = ['1.358','0.358','1.255','1.11','0.12','2.12','1.358','0.358','1.255','1.11','0.12','2.12','1.358','0.358','1.255','1.11','0.12','2.12','1.358','0.358','1.255','1.11','0.12','2.12','1.358','0.358','1.255','1.11','0.12','2.12','1.358','0.358','1.255','1.11','0.12','2.12','1.358','0.358','1.255','1.11','0.12','2.12','1.358','0.358','1.255','1.11','0.12','2.12','1.358','0.358','1.255','1.11','0.12','2.12','1.358','0.358','1.255','1.11','0.12','2.12','1.358','0.358','1.255','1.11','0.12','2.12','1.358','0.358','1.255','1.11','0.12','2.12','0.23']
-        print len(self.gldata) 
+    def getGroupChartLowData(self,brainType):
+        try:
+            if brainType == "Left":
+                fileList = self.gdata.leftFiles
+                length = len(fileList[0].thickAvgList)
+            elif brainType == "Right":
+                fileList = self.gdata.rightFiles
+                length = len(fileList[0].thickAvgList)
+            print "lenght:"+str(length)
+            self.gldata = []
+            for i in range(length):
+                temp = 10
+                for datafile in fileList:
+                    tempData = float(datafile.thickAvgList[i])
+                    if tempData < temp:
+                        temp = tempData
+                self.gldata.append(str(temp))
+        except:
+            print "getGroupChartLowData error"
+            traceback.print_exc()
+            self.gldata = ['1.358','0.358','1.255','1.11','0.12','2.12','1.358','0.358','1.255','1.11','0.12','2.12','1.358','0.358','1.255','1.11','0.12','2.12','1.358','0.358','1.255','1.11','0.12','2.12','1.358','0.358','1.255','1.11','0.12','2.12','1.358','0.358','1.255','1.11','0.12','2.12','1.358','0.358','1.255','1.11','0.12','2.12','1.358','0.358','1.255','1.11','0.12','2.12','1.358','0.358','1.255','1.11','0.12','2.12','1.358','0.358','1.255','1.11','0.12','2.12','1.358','0.358','1.255','1.11','0.12','2.12','1.358','0.358','1.255','1.11','0.12','2.12','0.23']
+        print "self.gldata:"+str(len(self.gldata)) 
         return self.gldata 
 #获取病人数据值
     def getPatientChartData(self,pid):
@@ -504,8 +685,8 @@ class GroupChartDao:
 
 
 class ZscoreChartDao:
-    def __init__ (self,gid):
-        self.gid = gid
+    def __init__ (self,gdata):
+        self.gdata = gdata
         print 'init zscore chart dao'
 #获得zscore数值
     def getZscore(self):
@@ -521,17 +702,27 @@ class ZscoreChartDao:
 #小心内存泄漏，没有clearcache
 class ReadFile:
     def __init__ (self,filepath):
+        print "filepath:"+filepath
         self.path = filepath
         self.file = linecache.getlines(filepath)[54:127]
-    def parseFile(self): 
-        self.areaList = []
-        self.thickAvgList = []
-        for line in self.file:
-            strs = re.split(r'\s+',line)
-            self.areaList.append(strs[0])
-            self.thickAvgList.append(strs[4])
-        print len(self.thickAvgList)
-        print len(self.areaList)
+        print self.file
+        self.parseFile()
+    def parseFile(self):
+        try: 
+            self.areaList = []
+            self.thickAvgList = []
+            for line in self.file:
+                strs = re.split(r'\s+',line)
+                self.areaList.append(strs[0])
+                self.thickAvgList.append(strs[4])
+            print len(self.thickAvgList)
+            print len(self.areaList)
+        except:
+            print "parse file error"
+            traceback.print_exc()
+        finally:
+            linecache.clearcache()
+
 
 class PatientDao:
 
@@ -545,11 +736,11 @@ class PatientDao:
         cu = BaseDAO.ctkDicomConnect.cursor()
         try:
             if sex == 'All':
-                cu.execute("SELECT Patient_UID,PatientsName,PatientsAGE,PatientsSex,Foldername FROM Patients_extend where Status = 2 and PatientsAge <= ? and PatientsAge >= ? and IsNormal = 1 limit ?",(agehigh,agelow,count,))
+                cu.execute("SELECT Patient_UID,PatientsName,PatientsAGE,PatientsSex,Foldername FROM Patients_extend where Status = 2 and PatientsAge <= ? and PatientsAge >= ? and IsNormal=1 limit ?",(agehigh,agelow,count))
             elif sex == 'Male':
-                cu.execute("SELECT Patient_UID,PatientsName,PatientsAGE,PatientsSex,Foldername FROM Patients_extend where Status = 2 and PatientsAge <= ? and PatientsAge >= ? and PatientsSex = 'M' and IsNormal=1  limit ?",(agehigh,agelow,count,))
+                cu.execute("SELECT Patient_UID,PatientsName,PatientsAGE,PatientsSex,Foldername FROM Patients_extend where Status = 2 and PatientsAge <= ? and PatientsAge >= ? and PatientsSex = 'M' and IsNormal=1 limit ?",(agehigh,agelow,count))
             elif sex == 'Female':
-                cu.execute("SELECT Patient_UID,PatientsName,PatientsAGE,PatientsSex,Foldername FROM Patients_extend where Status = 2 and PatientsAge <= ? and PatientsAge >= ? and PatientsSex = 'F' and IsNormal=1 limit ?",(agehigh,agelow,count,))
+                cu.execute("SELECT Patient_UID,PatientsName,PatientsAGE,PatientsSex,Foldername FROM Patients_extend where Status = 2 and PatientsAge <= ? and PatientsAge >= ? and PatientsSex = 'F' and IsNormal=1 limit ?",(agehigh,agelow,count))
 
             res = cu.fetchall()
             return res
@@ -588,5 +779,4 @@ class PatientDao:
             return 'Normal'
         else:
             return ''
-
 

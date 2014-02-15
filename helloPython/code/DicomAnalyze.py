@@ -2,10 +2,14 @@
 # -*- coding: utf-8 -*-
 
 from __main__ import vtk, qt, ctk, slicer
-# import sys
-# sys.path.append('/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/lib-dynload')
+import sys
+import platform
+if (platform.system() == "Darwin"):
+    sys.path.append('/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/lib-dynload')
+elif (platform.system() == "Linux"):
+    sys.path.append('/opt/Slicer-4.3.1-1/SlicerPy/helloPython/code')
 # import sqlite3
-from qt import QTableWidget,QTableWidgetItem,QPushButton,QWidget,QLabel
+from qt import QTableWidget,QTableWidgetItem,QPushButton,QWidget,QLabel,QProcess
 from DicomDAO import BaseDAO
 from BrainASUtils import PathDao
 import os
@@ -167,14 +171,14 @@ class DicomAnalyzeWidget:
                 lines = tempfile.readlines()
                 length = len(lines)
                 PUID = int(patient[0])
-                if length == 3 and "Done" in lines[2]:
+                if length == 2 and "Done" in lines[1]:
                     #update database to 2
-                    print "lines:"+lines[2].strip()
+                    #print "lines:"+lines[2].strip()
                     print "lines:"+lines[1].strip()
                     print "lines:"+lines[0].strip()
                     cu.execute('update Patients_extend set Status = 2 where Patient_UID = ?',(PUID,))
-                elif length == 2:
-                    print "lines:"+lines[1].strip()
+                # elif length == 2:
+                #     print "lines:"+lines[1].strip()
                     #check the time and if overtime should update status to 0 and kill process
                 elif length == 1:
                     print "lines:"+lines[0].strip()
@@ -187,7 +191,10 @@ class DicomAnalyzeWidget:
             raise
         finally:
             cu.close()
-            tempfile.close()
+            if len(res) > 0:
+                tempfile.close()
+
+
        
        
     def initDatabase(self):
@@ -211,7 +218,9 @@ class DicomAnalyzeWidget:
                     #age = nowdate.year - birthdate.year
                     age = studyDate.year - birthdate.year
             #status 0 means not handle , 1 mean processing , 2 means done
-                foldername = str(pExtendRow[0])+'.'+pExtendRow[1]+'.'+str(time.mktime(nowdate.timetuple()))
+                namelist = pExtendRow[1].split(' ')
+                namelistStr = "_".join(namelist)
+                foldername = str(pExtendRow[0])+'_'+namelistStr+'_'+str(time.mktime(nowdate.timetuple()))
                 #create folder to fs function should be attached to the function of processing, read folder name from database
                 print "folername"+str(foldername)
                 #create folder and file if don't exits
@@ -306,11 +315,14 @@ class AllRecordTable(MyTable):
                         #self.setBtnName(newBtn,'status',item)
                         newBtn.name = 'btnSARTable-%s-%s-%s'%(item[0],item[3],n)
                         #newBtn.setDisabled(False)
-                        newBtn.show()
+                        newBtn.button.show()
+                        print "setContentData:"+"new btn show:"+newBtn.name
                         btnText = "Start"
                         if item[3] == 1:
                             #newBtn.setDisabled(True)
-                            newBtn.hide()
+                            newBtn.button.hide()
+                            print "setContentData:"+"new btn hide:"+newBtn.name
+
                         elif item[3] == 2:
                             btnText = "Rerun"
                         newBtn.setText(btnText)                        
@@ -414,7 +426,11 @@ class AllRecordTable(MyTable):
                 print "targetDataPath:"+targetDataPath
                 print "fileName:"+fileName
                 print "tempFile:"+tempFile
-                subprocess.call([shellPath,targetDataPath,fileName,tempFile])
+                #subprocess.call([shellPath,targetDataPath,fileName,tempFile])
+                command = shellPath
+                args = [targetDataPath,fileName,tempFile]
+                process = QProcess()
+                process.startDetached(command,args)
         except:
             print "run freesurfer error"
             traceback.print_exc()

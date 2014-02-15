@@ -4,7 +4,11 @@ from __main__ import vtk, qt, ctk, slicer
 from qt import QLabel
 
 import sys
-sys.path.append('/dev_lic/SlicerPy/helloPython/code')
+import platform
+if (platform.system() == "Darwin"):
+    sys.path.append('/dev_lic/SlicerPy/helloPython/code')
+elif (platform.system() == "Linux"):
+    sys.path.append('/opt/Slicer-4.3.1-1/SlicerPy/helloPython/code')
 from BrainASUtils import CusUtils
 
 #

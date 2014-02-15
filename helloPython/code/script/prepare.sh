@@ -1,11 +1,7 @@
 #!/bin/bash
-export txt1="start_freesurfer processing at `date '+%Y-%m-%d %H:%M:%S'`"
-export txt4='D197'
+export txt1="start_freesurfer processing at `date +%H:%M:%S`" 
 export txt2="Done!"
-
-echo $1
-echo $2
-echo $3
-echo $txt1 >> $3 && echo $txt4 >> $3 && echo $txt2 >> $3
-
+./pid.sh "$3" &
+#./backend.sh "$1" $2 "$3" &
+export SUBJECTS_DIR="$1" export FREESURFER_HOME=/opt/freesurfer && source $FREESURFER_HOME/SetUpFreeSurfer.sh && echo $txt1 > "$3" && recon-all -i $2 -s patient && recon-all -all -s patient && echo $txt2 >>"$3"
 

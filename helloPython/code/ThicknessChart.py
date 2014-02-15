@@ -248,7 +248,7 @@ class ThicknessChartWidget:
         gid = []
 
 
-        root = self.qt_scan_result_list.invisibleRootItem()
+        root = self.normalRecordList.invisibleRootItem()
         child_count = root.childCount()
         for i in range(child_count):
             item = root.child(i)

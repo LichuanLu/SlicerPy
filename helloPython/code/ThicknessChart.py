@@ -3,7 +3,7 @@
 from __main__ import vtk, qt, ctk, slicer
 from DicomDAO import BaseDAO
 from BrainASUtils import PathDao
-
+import numpy as np
 import Charting
 import math
 import linecache
@@ -152,7 +152,7 @@ class ThicknessChartWidget:
         self.layout.addWidget(self.normalRecordList)
 
        
-        self.listTitle2 = qt.QLabel("Patient Record List:")
+        self.listTitle2 = qt.QLabel("Record List:")
         self.listTitle2.setFont(self.font)
         self.layout.addWidget(self.listTitle2)
 
@@ -418,7 +418,7 @@ class ThicknessChartWidget:
             localPatientChartData = groupChartDao.getPatientChartData(pid)
             localGroupChartHighData = groupChartDao.getGroupChartHighData(brainType)
             localGroupChartLowData = groupChartDao.getGroupChartLowData(brainType)
-
+            titleString = 'Cortex Thickness Group Analysis Chart-'+brainType+' Brain'
             result = "var data = ["
             result = result + self.generateDataString(localPatientChartData) + "," + self.generateDataString(localGroupChartHighData)+","+self.generateDataString(localGroupChartLowData)+"];"
             print "chart string:" + result
@@ -448,7 +448,7 @@ class ThicknessChartWidget:
                 show: true,
                 zoom: true,
             },
-            title:'Cortex Thickness Group Analysis Chart',
+            title:'''+titleString+''',
             '''+self.generateColorList(localGroupChartHighData,localGroupChartLowData,localPatientChartData)+'''
             series:[
                 {
@@ -515,13 +515,15 @@ class ThicknessChartWidget:
 
         elif charttype == "zscore":
             print "zscore"
+            titleString = 'Cortex Thickness Zscore Analysis Chart-'+brainType+' Brain'
             zscoreChartDao = ZscoreChartDao(gdata)
+            zscoreChartDao.setPatientChartData(pfileData.thickAvgList)
             zscoreChartDao.setAreaList(pfileData.areaList)
             result = "var data = ["
-            result = result + self.generateDataString(zscoreChartDao.getZscore())+"];"
-            print "chart string:" + result
+            result = result + self.generateDataString(zscoreChartDao.getZscore(brainType))+"];"
+            print "chart string zscore:" + result
             result = result + "var xAxisTicks = " + str(zscoreChartDao.getAreaList()) + ";"
-            print "chart string:" + result
+            print "chart string zscore:" + result
             optionStr = ''' var options = { 
             highlighter: {
                 show:true,
@@ -537,7 +539,7 @@ class ThicknessChartWidget:
                 show: true,
                 zoom: true,
             },
-            title:'Cortex Thickness Zscore Analysis Chart',
+            title:'''+titleString+''',
             series:[
                 {
                     rendererOptions: {
@@ -659,6 +661,7 @@ class GroupChartDao:
                 length = len(fileList[0].thickAvgList)
             print "lenght:"+str(length)
             self.gldata = []
+            #取最小值
             for i in range(length):
                 temp = 10
                 for datafile in fileList:
@@ -689,10 +692,42 @@ class ZscoreChartDao:
         self.gdata = gdata
         print 'init zscore chart dao'
 #获得zscore数值
-    def getZscore(self):
-        self.gdata = ['-1.24','-2.23','1.23','2.11','1.12','2.12','-1.24','-2.23','1.23','2.11','1.12','2.12','-1.24','-2.23','1.23','2.11','1.12','2.12','-1.24','-2.23','1.23','2.11','1.12','2.12','-1.24','-2.23','1.23','2.11','1.12','2.12','-1.24','-2.23','1.23','2.11','1.12','2.12','-1.24','-2.23','1.23','2.11','1.12','2.12','-1.24','-2.23','1.23','2.11','1.12','2.12','-1.24','-2.23','1.23','2.11','1.12','2.12','-1.24','-2.23','1.23','2.11','1.12','2.12','-1.24','-2.23','1.23','2.11','1.12','2.12','-1.24','-2.23','1.23','2.11','1.12','2.12','0.03']
-        print len(self.gdata)
-        return self.gdata 
+    def getZscore(self,brainType):
+        try:
+            if brainType == "Left":
+                fileList = self.gdata.leftFiles
+                length = len(fileList[0].thickAvgList)
+            elif brainType == "Right":
+                fileList = self.gdata.rightFiles
+                length = len(fileList[0].thickAvgList)
+            print "lenght:"+str(length)
+            self.zscoredata = []
+            #取zscore
+            for i in range(length):
+                tempList = []
+                #add all of the normal number to list
+                for datafile in fileList:
+                    tempList.append(float(datafile.thickAvgList[i]))
+                tempNPArray = np.array(tempList)
+                print tempNPArray
+                tempNPstd = tempNPArray.std(ddof=1)
+                if(tempNPstd != 0):
+                    tempzdata = (float(self.pdata[i])-tempNPArray.mean())/tempNPstd
+                else:
+                    tempzdata = 10
+                self.zscoredata.append(str(tempzdata))
+
+        except:
+            print "get zscore error"
+            traceback.print_exc()
+            self.zscoredata = ['-1.24','-2.23','1.23','2.11','1.12','2.12','-1.24','-2.23','1.23','2.11','1.12','2.12','-1.24','-2.23','1.23','2.11','1.12','2.12','-1.24','-2.23','1.23','2.11','1.12','2.12','-1.24','-2.23','1.23','2.11','1.12','2.12','-1.24','-2.23','1.23','2.11','1.12','2.12','-1.24','-2.23','1.23','2.11','1.12','2.12','-1.24','-2.23','1.23','2.11','1.12','2.12','-1.24','-2.23','1.23','2.11','1.12','2.12','-1.24','-2.23','1.23','2.11','1.12','2.12','-1.24','-2.23','1.23','2.11','1.12','2.12','-1.24','-2.23','1.23','2.11','1.12','2.12','0.03']
+        print len(self.zscoredata)
+        return self.zscoredata 
+#获取病人数据值
+    def getPatientChartData(self,pid):
+        return self.pdata
+    def setPatientChartData(self,data):
+        self.pdata = data
 #脑区对应的名称
     def getAreaList(self):
         return self.arealist

@@ -3,7 +3,7 @@ import platform
 if (platform.system() == "Darwin"):
     sys.path.append('/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/lib-dynload')
 elif (platform.system() == "Linux"):
-    sys.path.append('/opt/Slicer-4.3.1-1/SlicerPy/helloPython/code')
+    sys.path.append('/opt/python/lib/python2.7/lib-dynload')
 import sqlite3
 
 class BaseDAO:
